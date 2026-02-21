@@ -1,9 +1,11 @@
+import thumbnail from "../assets/thumbnail.jpg";
+
 // Dummy courses data with 16 diverse courses matching Figma design
 export const coursesData = [
   {
     id: 1,
     title: "Summer robotics camp: fun projects with auto arduino, Tinkering coins and 3d printing",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Coding",
     level: "Intermediate",
     duration: "7-10 yrs",
@@ -18,7 +20,7 @@ export const coursesData = [
   {
     id: 2,
     title: "Web development bootcamp: Learn full-stack JavaScript from scratch",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Coding",
     level: "Beginner",
     duration: "10-14 yrs",
@@ -33,7 +35,7 @@ export const coursesData = [
   {
     id: 3,
     title: "Python for kids: Build games and applications with Python",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Coding",
     level: "Beginner",
     duration: "8-12 yrs",
@@ -48,7 +50,7 @@ export const coursesData = [
   {
     id: 4,
     title: "Public speaking mastery: Overcome fear and build confidence",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Public speaking",
     level: "All levels",
     duration: "4-8 yrs",
@@ -63,7 +65,7 @@ export const coursesData = [
   {
     id: 5,
     title: "Chess fundamentals: Learn tactics and strategy like a pro",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Chess",
     level: "Intermediate",
     duration: "6-10 yrs",
@@ -78,7 +80,7 @@ export const coursesData = [
   {
     id: 6,
     title: "Home work help: Math, science, and language support",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Home work help",
     level: "Beginner",
     duration: "All ages",
@@ -93,7 +95,7 @@ export const coursesData = [
   {
     id: 7,
     title: "App building fundamentals: Create mobile apps with React Native",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "App building",
     level: "Intermediate",
     duration: "12-16 yrs",
@@ -108,7 +110,7 @@ export const coursesData = [
   {
     id: 8,
     title: "Creative writing workshop: Storytelling and character development",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Coding",
     level: "Beginner",
     duration: "8-12 yrs",
@@ -123,7 +125,7 @@ export const coursesData = [
   {
     id: 9,
     title: "Digital art essentials: Draw and paint in Procreate",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Public speaking",
     level: "Beginner",
     duration: "10-14 yrs",
@@ -138,7 +140,7 @@ export const coursesData = [
   {
     id: 10,
     title: "Music production basics: Create beats and mix tracks",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Chess",
     level: "Intermediate",
     duration: "12-16 yrs",
@@ -153,7 +155,7 @@ export const coursesData = [
   {
     id: 11,
     title: "Minecraft building masterclass: Advanced techniques",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Home work help",
     level: "Intermediate",
     duration: "6-10 yrs",
@@ -168,7 +170,7 @@ export const coursesData = [
   {
     id: 12,
     title: "STEM engineering: Build and test your own robots",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "App building",
     level: "Intermediate",
     duration: "8-12 yrs",
@@ -183,7 +185,7 @@ export const coursesData = [
   {
     id: 13,
     title: "Language learning: Fluent English in 90 days",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Coding",
     level: "Beginner",
     duration: "10-14 yrs",
@@ -198,7 +200,7 @@ export const coursesData = [
   {
     id: 14,
     title: "Debate club: Argumentation and presentation skills",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Public speaking",
     level: "All levels",
     duration: "8-12 yrs",
@@ -213,7 +215,7 @@ export const coursesData = [
   {
     id: 15,
     title: "Art fundamentals: Drawing, painting, and composition",
-    image: "thumbnail.jpg",
+    image: thumbnail,
     category: "Chess",
     level: "Beginner",
     duration: "9-13 yrs",
