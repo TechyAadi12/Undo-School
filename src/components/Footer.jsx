@@ -1,7 +1,7 @@
 import React from 'react';
 import { FiFacebook, FiTwitter, FiInstagram, FiLinkedin } from 'react-icons/fi';
 
-export default function Footer() {
+export default function Footer({ isDarkMode }) {
   const socialLinks = [
     { icon: FiFacebook, label: 'Facebook', href: 'https://facebook.com' },
     { icon: FiTwitter, label: 'Twitter', href: 'https://twitter.com' },
@@ -10,7 +10,11 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-neutral-900 text-neutral-100 border-t border-neutral-800">
+    <footer className={`transition-colors duration-300 ${
+      isDarkMode
+        ? 'bg-black border-t border-neutral-700'
+        : 'bg-black border-t border-neutral-800'
+    } text-neutral-100`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Brand */}
@@ -48,7 +52,11 @@ export default function Footer() {
       {/* Scroll to Top Button */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed bottom-8 right-8 w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:animate-subtle-bounce active:scale-95 transition duration-200 group"
+        className={`fixed bottom-8 right-8 w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:animate-subtle-bounce active:scale-95 transition-all duration-200 group ${
+          isDarkMode
+            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+            : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
+        }`}
         style={{
           opacity: typeof window !== 'undefined' && window.scrollY > 300 ? 1 : 0,
           pointerEvents: typeof window !== 'undefined' && window.scrollY > 300 ? 'auto' : 'none',

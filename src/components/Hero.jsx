@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Hero() {
+export default function Hero({ isDarkMode }) {
   const handleExploreCourses = () => {
     const coursesSection = document.querySelector('section');
     if (coursesSection) {
@@ -9,7 +9,11 @@ export default function Hero() {
   };
 
   return (
-    <div className="relative w-full h-96 md:h-96 overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 animate-gradient">
+    <div className={`relative w-full h-96 md:h-96 overflow-hidden transition-colors duration-300 ${
+      isDarkMode
+        ? 'bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-900'
+        : 'bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 animate-gradient'
+    }`}>
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <svg className="w-full h-full" viewBox="0 0 1200 400">

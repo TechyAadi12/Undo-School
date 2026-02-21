@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { FiSearch, FiX, FiChevronDown, FiFilter, FiMoon, FiSun } from 'react-icons/fi';
+import { FiSearch, FiX, FiChevronDown, FiFilter } from 'react-icons/fi';
 import { coursesData, filterOptions } from '../data/coursesData';
 import CourseCard from './CourseCard';
 import FilterPanel from './FilterPanel';
 import SearchBar from './SearchBar';
 
-export default function CourseBrowse() {
+export default function CourseBrowse({ isDarkMode }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedAgeGroups, setSelectedAgeGroups] = useState([]);
@@ -13,7 +13,6 @@ export default function CourseBrowse() {
   const [selectedRating, setSelectedRating] = useState(null);
   const [sortBy, setSortBy] = useState('popular');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Filter and sort logic
   const filteredCourses = useMemo(() => {
@@ -115,53 +114,38 @@ export default function CourseBrowse() {
     sortBy !== 'popular';
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-neutral-900' : 'bg-neutral-50'}`}>
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-neutral-950' : 'bg-gradient-to-b from-purple-50 via-blue-50 to-white'}`}>
       {/* Header Section */}
-      <header className={`${isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-white border-neutral-200'} border-b`}>
+      <header className={`transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 border-neutral-700' : 'bg-gradient-to-r from-blue-50 via-purple-50 to-blue-50 border-blue-100'} border-b`}>
         <div className="max-w-7xl mx-auto px-4 xs:px-6 md:px-8 py-4 md:py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className={`text-h3 md:text-h2 font-bold ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
+              <h1 className={`text-h3 md:text-h2 font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
                 Browse Courses
               </h1>
-              <p className={`text-body-md mt-1 md:mt-2 ${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}`}>
+              <p className={`text-body-md mt-1 md:mt-2 transition-colors duration-300 ${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}`}>
                 {filteredCourses.length} courses available
               </p>
             </div>
             
-            {/* Dark Mode Toggle and Desktop Sort */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className={`p-2 rounded-lg transition-colors-smooth ${
+            {/* Desktop Sort */}
+            <div className="hidden md:flex items-center gap-2">
+              <label className={`text-label transition-colors duration-300 ${isDarkMode ? 'text-neutral-300' : 'text-neutral-700'}`}>Sort by:</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className={`px-3 py-2 rounded-lg text-body-md transition-all-smooth ${
                   isDarkMode
-                    ? 'bg-neutral-700 text-yellow-400 hover:bg-neutral-600'
-                    : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-                }`}
-                aria-label="Toggle dark mode"
+                    ? 'bg-neutral-700 border-neutral-600 text-white hover:border-primary-400 focus:ring-primary-400'
+                    : 'border border-neutral-300 text-neutral-900 hover:border-primary-500 focus:ring-primary-500'
+                } border focus-outline`}
               >
-                {isDarkMode ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
-              </button>
-
-              {/* Desktop Sort Dropdown */}
-              <div className="hidden md:flex items-center gap-2">
-                <label className={`text-label ${isDarkMode ? 'text-neutral-300' : 'text-neutral-700'}`}>Sort by:</label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className={`px-3 py-2 rounded-lg text-body-md transition-all-smooth ${
-                    isDarkMode
-                      ? 'bg-neutral-700 border-neutral-600 text-white hover:border-primary-400 focus:ring-primary-400'
-                      : 'border border-neutral-300 text-neutral-900 hover:border-primary-500 focus:ring-primary-500'
-                  } border focus-outline`}
-                >
-                  {filterOptions.sortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                {filterOptions.sortOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
