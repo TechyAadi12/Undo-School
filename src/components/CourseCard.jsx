@@ -9,7 +9,7 @@ export default function CourseCard({ course, isDarkMode }) {
 
   return (
     <div
-      className={`rounded-xl overflow-hidden border transition-all-smooth hover:shadow-lg group animate-fade-in ${isDarkMode ? 'bg-neutral-800 border-neutral-700 hover:border-primary-400' : 'bg-white border-neutral-200 hover:border-primary-300'}`}
+      className={`rounded-xl overflow-hidden border transition-all-smooth hover:shadow-2xl group animate-fade-in hover:-translate-y-2 ${isDarkMode ? 'bg-neutral-800 border-neutral-700 hover:border-primary-400' : 'bg-white border-neutral-200 hover:border-primary-300'}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -24,8 +24,8 @@ export default function CourseCard({ course, isDarkMode }) {
 
         {/* Badge */}
         {course.badge && (
-          <div className="absolute top-3 left-3">
-            <span className="inline-flex items-center px-3 py-1 bg-accent-orange text-white text-xs font-bold rounded-full shadow-md">
+          <div className="absolute top-3 left-3 animate-bounce-scale">
+            <span className="inline-flex items-center px-3 py-1 bg-accent-orange text-white text-xs font-bold rounded-full shadow-md hover:shadow-lg transition duration-200">
               {course.badge}
             </span>
           </div>
@@ -48,12 +48,12 @@ export default function CourseCard({ course, isDarkMode }) {
 
         {/* Quick Info Overlay */}
         {isHovered && (
-          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center animate-fade-in">
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center animate-fade-in backdrop-blur-sm">
             <button
               onClick={() => setIsEnrollModalOpen(true)}
-              className="px-6 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors-smooth flex items-center gap-2 active:scale-95"
+              className="px-6 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-all duration-200 flex items-center gap-2 active:scale-95 hover:shadow-lg transform hover:scale-105"
             >
-              <FiShoppingCart className="w-5 h-5" />
+              <FiShoppingCart className="w-5 h-5 group-hover:animate-bounce" />
               Enroll now
             </button>
           </div>
@@ -109,8 +109,9 @@ export default function CourseCard({ course, isDarkMode }) {
           </div>
           <button
             onClick={() => setIsEnrollModalOpen(true)}
-            className="flex-1 px-4 py-2 bg-primary-500 text-white rounded-lg font-medium text-sm hover:bg-primary-600 transition-colors-smooth active:scale-95 transition-transform flex items-center justify-center gap-2 whitespace-nowrap"
+            className="flex-1 px-4 py-2 bg-primary-500 text-white rounded-lg font-medium text-sm hover:bg-primary-600 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap hover:shadow-lg transform hover:-translate-y-0.5 group relative overflow-hidden"
           >
+            <span className="absolute inset-0 bg-primary-600 opacity-0 group-hover:opacity-20 transition duration-200"></span>
             <FiShoppingCart className="w-4 h-4" />
             <span className="hidden sm:inline">Enroll</span>
           </button>

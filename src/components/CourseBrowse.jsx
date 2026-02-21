@@ -177,13 +177,13 @@ export default function CourseBrowse() {
           {/* Mobile Filter Toggle Button */}
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="lg:hidden flex items-center justify-center gap-2 px-4 py-3 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors-smooth active:scale-95 transition-transform"
+            className="lg:hidden flex items-center justify-center gap-2 px-4 py-3 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-all duration-200 active:scale-95 hover:shadow-lg transform hover:-translate-y-0.5"
             aria-label="Toggle filters"
           >
             <FiFilter className="w-5 h-5" />
             Filters
             {hasActiveFilters && (
-              <span className="ml-1 inline-flex items-center justify-center w-6 h-6 text-xs font-bold bg-accent-orange rounded-full text-white">
+              <span className="ml-1 inline-flex items-center justify-center w-6 h-6 text-xs font-bold bg-accent-orange rounded-full text-white animate-bounce-scale">
                 {[selectedCategories.length > 0 ? 1 : 0, selectedAgeGroups.length > 0 ? 1 : 0, selectedPriceRange ? 1 : 0, selectedRating ? 1 : 0, sortBy !== 'popular' ? 1 : 0].filter(Boolean).length}
               </span>
             )}
@@ -262,21 +262,29 @@ export default function CourseBrowse() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-6">
-                {filteredCourses.map((course) => (
-                  <CourseCard key={course.id} course={course} isDarkMode={isDarkMode} />
+                {filteredCourses.map((course, index) => (
+                  <div
+                    key={course.id}
+                    style={{
+                      animation: `slide-in-up 0.6s ease-out ${index * 0.08}s backwards`
+                    }}
+                  >
+                    <CourseCard course={course} isDarkMode={isDarkMode} />
+                  </div>
                 ))}
               </div>
             )}
 
             {/* Load More Button */}
             {filteredCourses.length > 0 && (
-              <div className="mt-8 text-center">
-                <button className={`px-8 py-3 rounded-lg font-medium transition-colors-smooth active:scale-95 transition-transform border-2 ${
+              <div className="mt-8 text-center animate-fade-in">
+                <button className={`px-8 py-3 rounded-lg font-medium transition-all duration-200 active:scale-95 border-2 hover:shadow-lg transform hover:-translate-y-1 group relative overflow-hidden ${
                   isDarkMode
                     ? 'border-primary-400 text-primary-400 hover:bg-primary-950'
                     : 'border-primary-500 text-primary-500 hover:bg-primary-50'
                 }`}>
-                  Load more courses
+                  <span className="relative z-10">Load more courses</span>
+                  <span className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-200 ${isDarkMode ? 'bg-primary-950' : 'bg-primary-50'}`}></span>
                 </button>
               </div>
             )}

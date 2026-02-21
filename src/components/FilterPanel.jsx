@@ -64,7 +64,7 @@ export default function FilterPanel({
           />
         </button>
         {expandedSections.category && (
-          <div className="space-y-2">
+          <div className="space-y-2 animate-expand">
             {categories.map((category) => (
               <label
                 key={category}
@@ -101,7 +101,7 @@ export default function FilterPanel({
           />
         </button>
         {expandedSections.age && (
-          <div className="space-y-2">
+          <div className="space-y-2 animate-expand">
             {ageGroups.map((ageGroup) => (
               <label
                 key={ageGroup}
@@ -138,7 +138,7 @@ export default function FilterPanel({
           />
         </button>
         {expandedSections.price && (
-          <div className="space-y-2">
+          <div className="space-y-2 animate-expand">
             {priceRanges.map((range, idx) => (
               <label
                 key={idx}
@@ -179,7 +179,7 @@ export default function FilterPanel({
           />
         </button>
         {expandedSections.rating && (
-          <div className="space-y-2">
+          <div className="space-y-2 animate-expand">
             {ratings.map((rating) => (
               <label
                 key={rating}
@@ -217,7 +217,7 @@ export default function FilterPanel({
           />
         </button>
         {expandedSections.sort && (
-          <div className="space-y-2">
+          <div className="space-y-2 animate-expand">
             {sortOptions.map((option) => (
               <label
                 key={option.value}

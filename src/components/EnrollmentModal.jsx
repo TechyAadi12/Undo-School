@@ -69,8 +69,8 @@ export default function EnrollmentModal({ course, isOpen, onClose }) {
         {/* Content */}
         <div className="p-6">
           {isSubmitted ? (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center py-8 animate-fade-in">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce-scale">
                 <FiCheck size={32} className="text-white" />
               </div>
               <h3 className="text-xl font-bold text-neutral-900 mb-2">
@@ -101,9 +101,9 @@ export default function EnrollmentModal({ course, isOpen, onClose }) {
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in">
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
+                  <div className="stagger-1">
                     <label className="block text-sm font-medium text-neutral-700 mb-1">
                       First Name
                     </label>
@@ -113,11 +113,11 @@ export default function EnrollmentModal({ course, isOpen, onClose }) {
                       value={formData.firstName}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 hover:border-neutral-400"
                       placeholder="John"
                     />
                   </div>
-                  <div>
+                  <div className="stagger-2">
                     <label className="block text-sm font-medium text-neutral-700 mb-1">
                       Last Name
                     </label>
@@ -127,13 +127,13 @@ export default function EnrollmentModal({ course, isOpen, onClose }) {
                       value={formData.lastName}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 hover:border-neutral-400"
                       placeholder="Doe"
                     />
                   </div>
                 </div>
 
-                <div>
+                <div className="stagger-3">
                   <label className="block text-sm font-medium text-neutral-700 mb-1">
                     Email Address
                   </label>
@@ -143,12 +143,12 @@ export default function EnrollmentModal({ course, isOpen, onClose }) {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 hover:border-neutral-400"
                     placeholder="john@example.com"
                   />
                 </div>
 
-                <div>
+                <div className="stagger-4">
                   <label className="block text-sm font-medium text-neutral-700 mb-1">
                     Phone Number
                   </label>
@@ -158,7 +158,7 @@ export default function EnrollmentModal({ course, isOpen, onClose }) {
                     value={formData.phone}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 hover:border-neutral-400"
                     placeholder="+1 (XXX) XXX-XXXX"
                   />
                 </div>
@@ -180,8 +180,9 @@ export default function EnrollmentModal({ course, isOpen, onClose }) {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-neutral-400 disabled:to-neutral-400 text-white font-semibold rounded-lg transition duration-200 active:scale-95 flex items-center justify-center gap-2"
+                  className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-neutral-400 disabled:to-neutral-400 text-white font-semibold rounded-lg active:scale-95 flex items-center justify-center gap-2 transition duration-200 hover:shadow-lg stagger-5 group relative overflow-hidden"
                 >
+                  <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition duration-200"></span>
                   {isLoading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
