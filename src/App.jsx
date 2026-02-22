@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import CourseBrowse from './components/CourseBrowse';
+import About from './components/About';
+import Contact from './components/Contact';
 import Footer from './components/Footer';
 
 export default function App() {
@@ -16,6 +18,8 @@ export default function App() {
       <Navbar isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
       <Hero isDarkMode={isDarkMode} />
       <CourseBrowse isDarkMode={isDarkMode} />
+      <About isDarkMode={isDarkMode} />
+      <Contact isDarkMode={isDarkMode} />
       <Footer isDarkMode={isDarkMode} />
     </div>
   );
