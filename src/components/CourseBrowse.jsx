@@ -157,28 +157,24 @@ export default function CourseBrowse({ isDarkMode }) {
   const newCourses = getNewCourses();
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-neutral-950' : 'bg-gradient-to-b from-purple-50 via-blue-50 to-white'}`}>
+    <div className="min-h-screen transition-colors duration-300">
       {/* Sticky Header Section */}
-      <header className={`sticky top-0 z-20 transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 border-neutral-700' : 'bg-gradient-to-r from-blue-50 via-purple-50 to-blue-50 border-blue-100'} border-b shadow-sm`}>
+      <header className="sticky top-0 z-20 border-b border-white/30 bg-white/20 shadow-sm backdrop-blur-xl transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 xs:px-6 md:px-8 py-3 md:py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h1 className={`text-h4 md:text-h3 font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
+              <h1 className="text-h4 md:text-h3 font-bold text-slate-950 transition-colors duration-300">
                 Browse Courses
               </h1>
             </div>
 
             {/* Desktop Sort */}
             <div className="hidden md:flex items-center gap-2">
-              <label className={`text-label transition-colors duration-300 ${isDarkMode ? 'text-neutral-300' : 'text-neutral-700'}`}>Sort:</label>
+              <label className="text-label text-slate-700 transition-colors duration-300">Sort:</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className={`px-3 py-2 text-sm rounded-lg transition-all-smooth ${
-                  isDarkMode
-                    ? 'bg-neutral-700 border border-neutral-600 text-white hover:border-primary-400 focus:ring-primary-400'
-                    : 'border border-neutral-300 bg-white text-neutral-900 hover:border-primary-500 focus:ring-primary-500'
-                } focus-outline`}
+                className="focus-outline rounded-lg border border-white/40 bg-white/70 px-3 py-2 text-sm text-neutral-900 transition-all-smooth hover:border-primary-500"
               >
                 {filterOptions.sortOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -212,8 +208,8 @@ export default function CourseBrowse({ isDarkMode }) {
         <div className="mb-8 animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Category Filter */}
-            <div className={`rounded-lg border p-4 transition-colors ${isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-white border-neutral-200'}`}>
-              <h3 className={`text-sm font-bold mb-3 transition-colors ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
+            <div className="rounded-2xl border border-white/35 bg-white/55 p-4 shadow-lg shadow-fuchsia-950/5 backdrop-blur-md transition-colors">
+              <h3 className="mb-3 text-sm font-bold text-neutral-900 transition-colors">
                 Category
               </h3>
               <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -234,8 +230,8 @@ export default function CourseBrowse({ isDarkMode }) {
             </div>
 
             {/* Age Group Filter */}
-            <div className={`rounded-lg border p-4 transition-colors ${isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-white border-neutral-200'}`}>
-              <h3 className={`text-sm font-bold mb-3 transition-colors ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
+            <div className="rounded-2xl border border-white/35 bg-white/55 p-4 shadow-lg shadow-fuchsia-950/5 backdrop-blur-md transition-colors">
+              <h3 className="mb-3 text-sm font-bold text-neutral-900 transition-colors">
                 Age Group
               </h3>
               <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -256,8 +252,8 @@ export default function CourseBrowse({ isDarkMode }) {
             </div>
 
             {/* Price Range Filter */}
-            <div className={`rounded-lg border p-4 transition-colors ${isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-white border-neutral-200'}`}>
-              <h3 className={`text-sm font-bold mb-3 transition-colors ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
+            <div className="rounded-2xl border border-white/35 bg-white/55 p-4 shadow-lg shadow-fuchsia-950/5 backdrop-blur-md transition-colors">
+              <h3 className="mb-3 text-sm font-bold text-neutral-900 transition-colors">
                 Price Range
               </h3>
               <div className="space-y-2">
@@ -279,8 +275,8 @@ export default function CourseBrowse({ isDarkMode }) {
             </div>
 
             {/* Rating Filter */}
-            <div className={`rounded-lg border p-4 transition-colors ${isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-white border-neutral-200'}`}>
-              <h3 className={`text-sm font-bold mb-3 transition-colors ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
+            <div className="rounded-2xl border border-white/35 bg-white/55 p-4 shadow-lg shadow-fuchsia-950/5 backdrop-blur-md transition-colors">
+              <h3 className="mb-3 text-sm font-bold text-neutral-900 transition-colors">
                 Rating
               </h3>
               <div className="space-y-2">

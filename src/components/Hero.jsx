@@ -1,7 +1,7 @@
 import React from 'react';
 import bgImage from '../assets/hero.jpg';
 
-export default function Hero({ isDarkMode }) {
+export default function Hero() {
   const handleExploreCourses = () => {
     const coursesSection = document.querySelector('section');
     if (coursesSection) {
@@ -10,11 +10,7 @@ export default function Hero({ isDarkMode }) {
   };
 
   return (
-    <div className={`relative w-full h-96 md:h-96 overflow-hidden transition-colors duration-300 ${
-      isDarkMode
-        ? 'bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-900'
-        : 'bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 animate-gradient'
-    }`}
+    <div className="relative w-full h-96 overflow-hidden transition-colors duration-300 md:h-96"
     style={{
       backgroundImage: `url(${bgImage})`,
       backgroundSize: 'cover',
@@ -22,7 +18,7 @@ export default function Hero({ isDarkMode }) {
       backgroundAttachment: 'fixed',
     }}>
       {/* Overlay for better text readability */}
-      <div className={`absolute inset-0 ${isDarkMode ? 'bg-black/50' : 'bg-black/40'}`}></div>
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(15,23,42,0.72),rgba(37,99,235,0.38),rgba(168,85,247,0.44))]"></div>
 
       {/* Content */}
       <div className="relative h-full flex items-center justify-center text-center px-4 md:px-8 z-20">
@@ -41,7 +37,7 @@ export default function Hero({ isDarkMode }) {
           <div className="flex justify-center animate-slide-in-up stagger-3">
             <button
               onClick={handleExploreCourses}
-              className="px-8 py-3 md:py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition duration-200 shadow-lg hover:shadow-2xl active:scale-95 group relative overflow-hidden"
+              className="relative overflow-hidden rounded-lg bg-white px-8 py-3 font-semibold text-blue-600 shadow-lg shadow-fuchsia-950/20 transition duration-200 hover:bg-blue-50 hover:shadow-2xl active:scale-95 group md:py-4"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 Explore Courses

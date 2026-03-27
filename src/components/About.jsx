@@ -1,7 +1,7 @@
 import React from 'react';
 import { FiAward, FiUsers, FiTarget, FiBook } from 'react-icons/fi';
 
-export default function About({ isDarkMode }) {
+export default function About() {
   const features = [
     {
       icon: FiTarget,
@@ -28,17 +28,15 @@ export default function About({ isDarkMode }) {
   return (
     <section
       id="about"
-      className={`py-16 px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
-        isDarkMode ? 'bg-neutral-900' : 'bg-gray-50'
-      }`}
+      className="px-4 py-16 transition-colors duration-300 sm:px-6 lg:px-8"
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className={`text-4xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+          <h2 className="mb-4 text-4xl font-bold text-slate-950">
             About Undo School
           </h2>
-          <p className={`text-lg max-w-2xl mx-auto ${isDarkMode ? 'text-neutral-400' : 'text-gray-600'}`}>
+          <p className="mx-auto max-w-2xl text-lg text-slate-700">
             We believe that education should be accessible, engaging, and transformative. Undo School is committed to providing high-quality online courses that help you achieve your goals.
           </p>
         </div>
@@ -50,19 +48,15 @@ export default function About({ isDarkMode }) {
             return (
               <div
                 key={index}
-                className={`p-6 rounded-lg transition duration-300 hover:shadow-lg ${
-                  isDarkMode
-                    ? 'bg-neutral-800 hover:bg-neutral-700'
-                    : 'bg-white hover:bg-blue-50'
-                }`}
+                className="rounded-2xl border border-white/35 bg-white/50 p-6 shadow-lg shadow-fuchsia-950/5 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:bg-white/60 hover:shadow-xl"
               >
                 <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white mb-4">
                   <IconComponent size={24} />
                 </div>
-                <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                <h3 className="mb-2 text-lg font-semibold text-slate-900">
                   {feature.title}
                 </h3>
-                <p className={isDarkMode ? 'text-neutral-400' : 'text-gray-600'}>
+                <p className="text-slate-700">
                   {feature.description}
                 </p>
               </div>
@@ -81,7 +75,7 @@ export default function About({ isDarkMode }) {
               <p className={`text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent`}>
                 {stat.number}
               </p>
-              <p className={`text-lg mt-2 ${isDarkMode ? 'text-neutral-400' : 'text-gray-600'}`}>
+              <p className="mt-2 text-lg text-slate-700">
                 {stat.label}
               </p>
             </div>

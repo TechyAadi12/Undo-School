@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FiMail, FiPhone, FiMapPin, FiSend } from 'react-icons/fi';
 import emailjs from 'emailjs-com';
 
-export default function Contact({ isDarkMode }) {
+export default function Contact() {
   const [formData, setFormData] = useState({
     user_name: '',
     user_email: '',
@@ -74,18 +74,16 @@ export default function Contact({ isDarkMode }) {
   return (
     <section
       id="contact"
-      className={`py-16 px-4 sm:px-6 lg:px-8 ${
-        isDarkMode ? 'bg-neutral-800' : 'bg-white'
-      }`}
+      className="px-4 py-16 sm:px-6 lg:px-8"
     >
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className={`text-4xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+          <h2 className="mb-4 text-4xl font-bold text-slate-950">
             Get In Touch
           </h2>
-          <p className={`text-lg max-w-2xl mx-auto ${isDarkMode ? 'text-neutral-400' : 'text-gray-600'}`}>
+          <p className="mx-auto max-w-2xl text-lg text-slate-700">
             Have questions? We'd love to hear from you.
           </p>
         </div>
@@ -102,10 +100,10 @@ export default function Contact({ isDarkMode }) {
                     <Icon size={24} />
                   </div>
                   <div>
-                    <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <h3 className="font-semibold text-slate-900">
                       {info.label}
                     </h3>
-                    <p className={isDarkMode ? 'text-neutral-400' : 'text-gray-600'}>
+                    <p className="text-slate-700">
                       {info.value}
                     </p>
                   </div>
@@ -115,7 +113,7 @@ export default function Contact({ isDarkMode }) {
           </div>
 
           {/* FORM */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl border border-white/35 bg-white/50 p-6 shadow-xl shadow-fuchsia-950/10 backdrop-blur-md">
 
             <input
               type="text"
@@ -124,7 +122,7 @@ export default function Contact({ isDarkMode }) {
               onChange={handleChange}
               required
               placeholder="Your name"
-              className="w-full px-4 py-2 rounded-lg border"
+              className="w-full rounded-xl border border-white/40 bg-white/80 px-4 py-3 text-slate-900 placeholder:text-slate-500 focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-200/60"
             />
 
             <input
@@ -134,7 +132,7 @@ export default function Contact({ isDarkMode }) {
               onChange={handleChange}
               required
               placeholder="Your email"
-              className="w-full px-4 py-2 rounded-lg border"
+              className="w-full rounded-xl border border-white/40 bg-white/80 px-4 py-3 text-slate-900 placeholder:text-slate-500 focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-200/60"
             />
 
             <input
@@ -144,7 +142,7 @@ export default function Contact({ isDarkMode }) {
               onChange={handleChange}
               required
               placeholder="Subject"
-              className="w-full px-4 py-2 rounded-lg border"
+              className="w-full rounded-xl border border-white/40 bg-white/80 px-4 py-3 text-slate-900 placeholder:text-slate-500 focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-200/60"
             />
 
             <textarea
@@ -154,19 +152,19 @@ export default function Contact({ isDarkMode }) {
               required
               rows="5"
               placeholder="Your message..."
-              className="w-full px-4 py-2 rounded-lg border"
+              className="w-full rounded-xl border border-white/40 bg-white/80 px-4 py-3 text-slate-900 placeholder:text-slate-500 focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-200/60"
             />
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg"
+              className="w-full rounded-xl bg-gradient-to-r from-blue-600 via-fuchsia-500 to-orange-400 px-6 py-3 font-semibold text-white shadow-lg shadow-fuchsia-950/20 transition hover:scale-[1.01]"
             >
               {loading ? "Sending..." : "Send Message"}
             </button>
 
             {submitted && (
-              <div className="p-4 bg-green-100 text-green-800 text-center rounded-lg">
+              <div className="rounded-xl bg-emerald-100 p-4 text-center text-emerald-800">
                 ✅ Message sent successfully!
               </div>
             )}
