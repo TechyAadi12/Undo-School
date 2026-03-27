@@ -60,10 +60,11 @@ export default function CourseCard({ course, isDarkMode }) {
         {/* Quick Info Overlay with enhanced animation */}
         {isHovered && (
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-center justify-center animate-fade-in backdrop-blur-sm">
-            <button
-              onClick={() => setIsEnrollModalOpen(true)}
-              className="px-6 py-3 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-all duration-200 flex items-center gap-2 active:scale-95 hover:shadow-xl transform hover:scale-105 shadow-lg"
-            >
+          <button
+            type="button"
+            onClick={() => setIsEnrollModalOpen(true)}
+            className="px-6 py-3 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-all duration-200 flex items-center gap-2 active:scale-95 hover:shadow-xl transform hover:scale-105 shadow-lg"
+          >
               <FiShoppingCart className="w-5 h-5 animate-pulse" />
               Enroll now
             </button>
@@ -123,6 +124,7 @@ export default function CourseCard({ course, isDarkMode }) {
             </p>
           </div>
           <button
+            type="button"
             onClick={() => setIsEnrollModalOpen(true)}
             className="flex-1 px-4 py-2 bg-primary-500 text-white rounded-lg font-medium text-sm hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap hover:shadow-lg transform hover:-translate-y-0.5 group/btn relative overflow-hidden"
           >
