@@ -1,146 +1,194 @@
 import React, { useState } from 'react';
-import { FiShoppingCart, FiHeart } from 'react-icons/fi';
+import { SignInButton } from '@clerk/react';
+import { FiBookmark, FiLock, FiPlayCircle, FiShoppingCart, FiStar, FiUsers } from 'react-icons/fi';
 import EnrollmentModal from './EnrollmentModal';
 
-export default function CourseCard({ course, isDarkMode }) {
-  const [isFavorite, setIsFavorite] = useState(false);
+export default function CourseCard({
+  course,
+  isAuthenticated = false,
+  isPreviewMode = false,
+  isSaved = false,
+  isEnrolled = false,
+  progress = 0,
+  onToggleSave,
+  onEnroll,
+  onContinue,
+}) {
   const [isHovered, setIsHovered] = useState(false);
   const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  return (
-    <div
-      className={`rounded-xl overflow-hidden border transition-all-smooth hover:shadow-2xl group animate-fade-in hover:-translate-y-2 ${isDarkMode ? 'bg-neutral-800 border-neutral-700 hover:border-primary-400' : 'bg-white border-neutral-200 hover:border-primary-300'}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Image Container */}
-      <div className={`relative overflow-hidden h-48 sm:h-56 ${isDarkMode ? 'bg-neutral-700' : 'bg-neutral-200'}`}>
-        {/* Lazy loaded image with skeleton */}
-        <img
-          src={course.image}
-          alt={course.title}
-          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${
-            imageLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-          loading="lazy"
-          onLoad={() => setImageLoaded(true)}
-        />
+  const handleSave = () => {
+    onToggleSave?.(course.id);
+  };
 
-        {/* Badge with enhanced styling */}
-        {course.badge && (
-          <div className="absolute top-3 left-3">
-            <span className={`inline-flex items-center px-3 py-1 text-xs font-bold rounded-full shadow-lg transition-all duration-200 transform hover:scale-105 ${
-              course.badge === 'Selling fast'
-                ? 'bg-accent-orange text-white'
-                : course.badge === 'New course'
-                ? 'bg-green-500 text-white'
-                : 'bg-blue-500 text-white'
-            }`}>
-              {course.badge}
+  const handlePrimaryAction = () => {
+    if (isEnrolled) {
+      onContinue?.(course.id);
+      return;
+    }
+
+    setIsEnrollModalOpen(true);
+  };
+
+  const ctaLabel = isAuthenticated
+    ? isEnrolled
+      ? 'Resume course'
+      : 'Enroll now'
+    : 'Login to enroll';
+
+  const ActionButton = ({ className }) => {
+    if (!isAuthenticated) {
+      return (
+        <SignInButton mode="modal">
+          <button type="button" className={className}>
+            <FiLock className="h-4 w-4" />
+            {ctaLabel}
+          </button>
+        </SignInButton>
+      );
+    }
+
+    return (
+      <button type="button" onClick={handlePrimaryAction} className={className}>
+        {isEnrolled ? <FiPlayCircle className="h-4 w-4" /> : <FiShoppingCart className="h-4 w-4" />}
+        {ctaLabel}
+      </button>
+    );
+  };
+
+  return (
+    <>
+      <article
+        className="group relative overflow-hidden rounded-[1.75rem] border border-white/45 bg-white/80 shadow-lg shadow-slate-900/5 transition duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-slate-900/10"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="relative h-52 overflow-hidden bg-slate-100">
+          <img
+            src={course.image}
+            alt={course.title}
+            className={`h-full w-full object-cover transition duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'} group-hover:scale-105`}
+            loading="lazy"
+            onLoad={() => setImageLoaded(true)}
+          />
+
+          <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3.5">
+            <div className="flex flex-wrap gap-2">
+              {course.badge && (
+                <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-md">
+                  {course.badge}
+                </span>
+              )}
+              <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 shadow-md">
+                {course.ageGroup}
+              </span>
+            </div>
+
+            {!isPreviewMode && (
+              <button
+                type="button"
+                onClick={handleSave}
+                className={`rounded-full p-2.5 shadow-md backdrop-blur-sm transition ${
+                  isSaved
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-white/85 text-slate-700 hover:bg-white'
+                }`}
+                aria-label={isSaved ? 'Remove course from saved list' : 'Save course'}
+              >
+                <FiBookmark className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
+              </button>
+            )}
+          </div>
+
+          <div
+            className={`absolute inset-0 flex items-end bg-gradient-to-t from-slate-950/75 via-slate-950/25 to-transparent p-4 transition ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <div className="w-full rounded-2xl border border-white/10 bg-white/15 p-3 text-white backdrop-blur-sm">
+              <p className="text-sm font-semibold">Ready to start?</p>
+              <p className="mt-1 text-xs text-slate-100/90">
+                {isAuthenticated
+                  ? 'Enroll to add this course to your dashboard and track progress.'
+                  : 'Login to unlock enrollment, saved courses, and your personalized dashboard.'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3.5 p-[18px]">
+          <div className="flex items-center justify-between gap-3">
+            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+              {course.category}
+            </span>
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+              {course.level}
             </span>
           </div>
-        )}
 
-        {/* Favorite Button with enhanced interaction */}
-        <button
-          onClick={() => setIsFavorite(!isFavorite)}
-          className={`absolute top-3 right-3 p-2 rounded-full shadow-md transition-all-smooth transform hover:scale-110 active:scale-95 backdrop-blur-sm ${isDarkMode ? 'bg-neutral-800/80 hover:bg-neutral-700/90' : 'bg-white/80 hover:bg-white/90'}`}
-          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-        >
-          <FiHeart
-            className={`w-5 h-5 transition-all duration-300 ${
-              isFavorite
-                ? 'fill-accent-orange text-accent-orange scale-125'
-                : 'text-neutral-600'
-            }`}
-          />
-        </button>
-
-        {/* Quick Info Overlay with enhanced animation */}
-        {isHovered && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-center justify-center animate-fade-in backdrop-blur-sm">
-          <button
-            type="button"
-            onClick={() => setIsEnrollModalOpen(true)}
-            className="px-6 py-3 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-all duration-200 flex items-center gap-2 active:scale-95 hover:shadow-xl transform hover:scale-105 shadow-lg"
-          >
-              <FiShoppingCart className="w-5 h-5 animate-pulse" />
-              Enroll now
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="p-4 sm:p-5 flex flex-col h-full">
-        {/* Category & Level */}
-        <div className="flex items-center gap-2 mb-2">
-          <span className={`text-xs font-bold px-3 py-1 rounded-full transition-colors ${isDarkMode ? 'text-primary-400 bg-primary-950 group-hover:bg-primary-900' : 'text-primary-600 bg-primary-50 group-hover:bg-primary-100'}`}>
-            {course.category}
-          </span>
-          <span className={`text-xs px-2 py-1 rounded font-medium transition-colors ${isDarkMode ? 'text-neutral-400 bg-neutral-700 group-hover:bg-neutral-600' : 'text-neutral-600 bg-neutral-100 group-hover:bg-neutral-200'}`}>
-            {course.level}
-          </span>
-        </div>
-
-        {/* Title with enhanced hover */}
-        <h3 className={`text-body-md sm:text-body-lg font-semibold mb-2 line-clamp-2 transition-colors-smooth cursor-pointer ${isDarkMode ? 'text-white group-hover:text-primary-400' : 'text-neutral-900 group-hover:text-primary-600'}`}>
-          {course.title}
-        </h3>
-
-        {/* Duration & Rating with icons */}
-        <div className={`flex items-center justify-between mb-3 text-xs sm:text-body-sm gap-2 ${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}`}>
-          <span className="flex items-center gap-1 whitespace-nowrap">
-            <span>⏱️</span>
-            <span className="hidden sm:inline">{course.duration}</span>
-            <span className="sm:hidden">{course.duration.split('-')[0]}yrs</span>
-          </span>
-          <span className="flex items-center gap-1 whitespace-nowrap">
-            <span>⭐</span>
-            <span>{course.rating}</span>
-            <span className="hidden sm:inline text-neutral-500">({course.reviews})</span>
-          </span>
-        </div>
-
-        {/* Instructor Info with enhanced styling */}
-        <div className={`flex items-center gap-2 mb-4 pb-4 border-b transition-colors ${isDarkMode ? 'border-neutral-700 group-hover:border-primary-700' : 'border-neutral-200 group-hover:border-primary-200'}`}>
-          <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-md">
-            {course.instructor.charAt(0)}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className={`text-xs sm:text-body-sm font-medium truncate transition-colors ${isDarkMode ? 'text-neutral-300 group-hover:text-primary-400' : 'text-neutral-700 group-hover:text-primary-600'}`}>
-              By {course.instructor}
-            </p>
-            <p className={`text-xs ${isDarkMode ? 'text-neutral-500' : 'text-neutral-500'}`}>{course.enrolledCount} enrolled</p>
-          </div>
-        </div>
-
-        {/* Price & CTA */}
-        <div className="flex items-center justify-between gap-3 mt-auto">
           <div>
-            <p className={`text-h5 sm:text-h6 font-bold transition-colors ${isDarkMode ? 'text-white group-hover:text-primary-400' : 'text-neutral-900 group-hover:text-primary-600'}`}>
-              ${course.price}
+            <h3 className="line-clamp-2 text-lg font-semibold text-slate-900 transition group-hover:text-blue-700">
+              {course.title}
+            </h3>
+            <p className="mt-1.5 text-sm text-slate-600">
+              By {course.instructor} • {course.duration}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setIsEnrollModalOpen(true)}
-            className="flex-1 px-4 py-2 bg-primary-500 text-white rounded-lg font-medium text-sm hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap hover:shadow-lg transform hover:-translate-y-0.5 group/btn relative overflow-hidden"
-          >
-            <span className="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-500 opacity-0 group-hover/btn:opacity-20 transition duration-200"></span>
-            <FiShoppingCart className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
-            <span className="hidden sm:inline">Enroll</span>
-          </button>
-        </div>
-      </div>
 
-      {/* Enrollment Modal */}
+          <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
+            <span className="inline-flex items-center gap-1.5">
+              <FiStar className="h-4 w-4 text-amber-400" />
+              {course.rating} ({course.reviews})
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <FiUsers className="h-4 w-4 text-slate-400" />
+              {course.enrolledCount} enrolled
+            </span>
+          </div>
+
+          {isEnrolled && (
+            <div>
+              <div className="mb-2 flex items-center justify-between text-xs font-medium text-slate-500">
+                <span>Learning progress</span>
+                <span>{progress}% complete</span>
+              </div>
+              <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-blue-600 to-cyan-400 transition-all duration-500"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {!isAuthenticated && (
+            <div className="flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700">
+              <FiLock className="h-4 w-4" />
+              Login to enroll, save courses, and unlock your learning dashboard.
+            </div>
+          )}
+
+          <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-3.5">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                {isPreviewMode ? 'Access' : 'Price'}
+              </p>
+              <p className="mt-1 text-xl font-bold text-slate-900">
+                {isPreviewMode ? 'Members only' : `$${course.price}`}
+              </p>
+            </div>
+            <ActionButton className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700" />
+          </div>
+        </div>
+      </article>
+
       <EnrollmentModal
         course={course}
         isOpen={isEnrollModalOpen}
         onClose={() => setIsEnrollModalOpen(false)}
+        onEnrollmentSuccess={() => onEnroll?.(course.id)}
       />
-    </div>
+    </>
   );
 }

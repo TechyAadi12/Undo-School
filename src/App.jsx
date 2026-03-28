@@ -1,27 +1,173 @@
-import React from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import CourseBrowse from './components/CourseBrowse';
-import About from './components/About';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
+import React, { useMemo } from 'react';
+import { useUser } from '@clerk/react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute';
+import usePersistentState from './hooks/usePersistentState';
+import DashboardPage from './pages/DashboardPage';
+import LandingPage from './pages/LandingPage';
+
+const defaultFilters = {
+  searchQuery: '',
+  selectedCategories: [],
+  selectedAgeGroups: [],
+  selectedPriceRange: null,
+  selectedRating: null,
+  sortBy: 'popular',
+};
 
 export default function App() {
-  return (
-    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,_#fde68a_0%,_#fb7185_22%,_#c084fc_48%,_#60a5fa_74%,_#22d3ee_100%)] text-neutral-900">
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.22),transparent_38%,rgba(255,255,255,0.12)_100%)]" />
-      <div className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-orange-300/30 blur-3xl" />
-      <div className="pointer-events-none absolute right-0 top-1/3 h-80 w-80 rounded-full bg-fuchsia-300/25 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 left-1/3 h-96 w-96 rounded-full bg-cyan-200/25 blur-3xl" />
+  const { user, isSignedIn } = useUser();
+  const [savedCourseIds, setSavedCourseIds] = usePersistentState(
+    'undo-school-saved-courses',
+    []
+  );
+  const [enrolledCourses, setEnrolledCourses] = usePersistentState(
+    'undo-school-enrolled-courses',
+    []
+  );
+  const [courseFilters, setCourseFilters] = usePersistentState(
+    'undo-school-course-filters',
+    defaultFilters
+  );
 
-      <div className="relative font-sans">
-        <Navbar />
-        <Hero />
-        <CourseBrowse />
-        <About />
-        <Contact />
-        <Footer />
-      </div>
-    </div>
+  const userName =
+    user?.firstName || user?.username || user?.primaryEmailAddress?.emailAddress?.split('@')[0] || 'Learner';
+  const userEmail = user?.primaryEmailAddress?.emailAddress || 'learner@edupathway.com';
+
+  const savedCourseIdSet = useMemo(() => new Set(savedCourseIds), [savedCourseIds]);
+  const enrolledById = useMemo(
+    () => new Map(enrolledCourses.map((course) => [course.courseId, course])),
+    [enrolledCourses]
+  );
+
+  const handleToggleSavedCourse = (courseId) => {
+    setSavedCourseIds((prev) =>
+      prev.includes(courseId)
+        ? prev.filter((id) => id !== courseId)
+        : [...prev, courseId]
+    );
+  };
+
+  const handleEnrollCourse = (courseId) => {
+    setEnrolledCourses((prev) => {
+      const existingCourse = prev.find((course) => course.courseId === courseId);
+
+      if (existingCourse) {
+        return prev.map((course) =>
+          course.courseId === courseId
+            ? {
+                ...course,
+                progress: Math.min(course.progress + 12, 100),
+                updatedAt: new Date().toISOString(),
+              }
+            : course
+        );
+      }
+
+      return [
+        ...prev,
+        {
+          courseId,
+          progress: 12,
+          updatedAt: new Date().toISOString(),
+        },
+      ];
+    });
+  };
+
+  const handleContinueCourse = (courseId) => {
+    setEnrolledCourses((prev) =>
+      prev.map((course) =>
+        course.courseId === courseId
+          ? {
+              ...course,
+              progress: Math.min(course.progress + 8, 100),
+              updatedAt: new Date().toISOString(),
+            }
+          : course
+      )
+    );
+  };
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            isSignedIn ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <LandingPage
+                savedCourseIdSet={savedCourseIdSet}
+                enrolledById={enrolledById}
+                courseFilters={courseFilters}
+                onFiltersChange={setCourseFilters}
+                onToggleSavedCourse={handleToggleSavedCourse}
+                onEnrollCourse={handleEnrollCourse}
+                onContinueCourse={handleContinueCourse}
+              />
+            )
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage
+                userName={userName}
+                userEmail={userEmail}
+                savedCourseIdSet={savedCourseIdSet}
+                enrolledById={enrolledById}
+                courseFilters={courseFilters}
+                onFiltersChange={setCourseFilters}
+                onToggleSavedCourse={handleToggleSavedCourse}
+                onEnrollCourse={handleEnrollCourse}
+                onContinueCourse={handleContinueCourse}
+              />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/courses"
+          element={
+            <ProtectedRoute>
+              <DashboardPage
+                section="courses"
+                userName={userName}
+                userEmail={userEmail}
+                savedCourseIdSet={savedCourseIdSet}
+                enrolledById={enrolledById}
+                courseFilters={courseFilters}
+                onFiltersChange={setCourseFilters}
+                onToggleSavedCourse={handleToggleSavedCourse}
+                onEnrollCourse={handleEnrollCourse}
+                onContinueCourse={handleContinueCourse}
+              />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/profile"
+          element={
+            <ProtectedRoute>
+              <DashboardPage
+                section="profile"
+                userName={userName}
+                userEmail={userEmail}
+                savedCourseIdSet={savedCourseIdSet}
+                enrolledById={enrolledById}
+                courseFilters={courseFilters}
+                onFiltersChange={setCourseFilters}
+                onToggleSavedCourse={handleToggleSavedCourse}
+                onEnrollCourse={handleEnrollCourse}
+                onContinueCourse={handleContinueCourse}
+              />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

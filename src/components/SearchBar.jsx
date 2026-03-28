@@ -1,33 +1,28 @@
 import React from 'react';
 import { FiSearch, FiX } from 'react-icons/fi';
 
-export default function SearchBar({ searchQuery, setSearchQuery, isDarkMode }) {
-  const handleClear = () => {
-    setSearchQuery('');
-  };
-
+export default function SearchBar({ searchQuery, setSearchQuery }) {
   return (
     <div className="relative w-full">
-      <div className="relative">
-        <FiSearch className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition duration-200 ${isDarkMode ? 'text-neutral-500' : 'text-neutral-400'}`} />
-        <input
-          type="text"
-          placeholder="What do you want to learn today?"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className={`w-full pl-12 pr-12 py-3 md:py-4 border-2 rounded-xl text-body-md focus:outline-none transition-all duration-200 ${isDarkMode ? 'bg-neutral-700 border-neutral-600 text-white placeholder:text-neutral-400 focus:border-primary-400 focus:shadow-lg focus:shadow-primary-500/20' : 'border-neutral-300 text-neutral-900 placeholder:text-neutral-500 focus:border-primary-500 focus:shadow-lg focus:shadow-primary-500/10'}`}
-          aria-label="Search courses"
-        />
-        {searchQuery && (
-          <button
-            onClick={handleClear}
-            className={`absolute right-4 top-1/2 -translate-y-1/2 transition-all duration-200 p-1 hover:scale-110 active:scale-95 ${isDarkMode ? 'text-neutral-500 hover:text-neutral-300' : 'text-neutral-400 hover:text-neutral-600'}`}
-            aria-label="Clear search"
-          >
-            <FiX className="w-5 h-5" />
-          </button>
-        )}
-      </div>
+      <FiSearch className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+      <input
+        type="text"
+        placeholder="Search by title, domain, or instructor"
+        value={searchQuery}
+        onChange={(event) => setSearchQuery(event.target.value)}
+        className="w-full rounded-[1.75rem] border border-slate-200 bg-white px-12 py-4 text-sm text-slate-900 shadow-sm outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+        aria-label="Search courses"
+      />
+      {searchQuery && (
+        <button
+          type="button"
+          onClick={() => setSearchQuery('')}
+          className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+          aria-label="Clear search"
+        >
+          <FiX className="h-5 w-5" />
+        </button>
+      )}
     </div>
   );
 }

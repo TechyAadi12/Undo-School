@@ -4,30 +4,39 @@ import { FiX } from 'react-icons/fi';
 export default function FilterTags({
   searchQuery,
   selectedCategories,
+  selectedAgeGroups,
   selectedPriceRange,
   selectedRating,
-  priceRanges,
+  onClearSearch,
   onRemoveCategory,
+  onRemoveAgeGroup,
   onRemovePriceRange,
   onRemoveRating,
   onClearAll,
-  isDarkMode,
 }) {
   const tags = [];
 
   if (searchQuery) {
     tags.push({
       id: `search-${searchQuery}`,
-      label: `Search: "${searchQuery}"`,
+      label: `Search: ${searchQuery}`,
       type: 'search',
     });
   }
 
-  selectedCategories.forEach((cat) => {
+  selectedCategories.forEach((category) => {
     tags.push({
-      id: `category-${cat}`,
-      label: cat,
+      id: `category-${category}`,
+      label: category,
       type: 'category',
+    });
+  });
+
+  selectedAgeGroups.forEach((ageGroup) => {
+    tags.push({
+      id: `age-${ageGroup}`,
+      label: ageGroup,
+      type: 'age',
     });
   });
 
@@ -42,12 +51,12 @@ export default function FilterTags({
   if (selectedRating) {
     tags.push({
       id: 'rating',
-      label: `${selectedRating}+ rated`,
+      label: `${selectedRating}+ rating`,
       type: 'rating',
     });
   }
 
-  if (tags.length === 0) {
+  if (!tags.length) {
     return null;
   }
 
@@ -55,6 +64,12 @@ export default function FilterTags({
     switch (tag.type) {
       case 'category':
         onRemoveCategory(tag.label);
+        break;
+      case 'search':
+        onClearSearch?.();
+        break;
+      case 'age':
+        onRemoveAgeGroup(tag.label);
         break;
       case 'priceRange':
         onRemovePriceRange();
@@ -68,52 +83,29 @@ export default function FilterTags({
   };
 
   return (
-    <div
-      className={`mb-6 p-4 rounded-lg border animate-fade-in ${
-        isDarkMode
-          ? 'bg-blue-900 border-blue-700'
-          : 'bg-blue-50 border-blue-200'
-      }`}
-    >
+    <div className="mt-5 rounded-[1.5rem] border border-blue-100 bg-blue-50/70 p-4">
       <div className="flex flex-wrap items-center gap-3">
-        <span
-          className={`text-sm font-medium ${
-            isDarkMode ? 'text-blue-200' : 'text-blue-700'
-          }`}
-        >
-          Active filters:
-        </span>
+        <span className="text-sm font-semibold text-blue-800">Active filters</span>
 
-        <div className="flex flex-wrap gap-2">
-          {tags.map((tag) => (
-            <button
-              key={tag.id}
-              onClick={() => handleRemoveTag(tag)}
-              className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium transition-all hover:shadow-md active:scale-95 ${
-                isDarkMode
-                  ? 'bg-blue-700 text-blue-100 hover:bg-blue-600'
-                  : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-              }`}
-              aria-label={`Remove ${tag.label} filter`}
-            >
-              {tag.label}
-              <FiX className="w-4 h-4" />
-            </button>
-          ))}
-        </div>
-
-        {tags.length > 0 && (
+        {tags.map((tag) => (
           <button
-            onClick={onClearAll}
-            className={`ml-auto text-sm font-medium hover:underline transition ${
-              isDarkMode
-                ? 'text-blue-300 hover:text-blue-200'
-                : 'text-blue-600 hover:text-blue-700'
-            }`}
+            key={tag.id}
+            type="button"
+            onClick={() => handleRemoveTag(tag)}
+            className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:shadow"
           >
-            Clear all
+            {tag.label}
+            <FiX className="h-4 w-4" />
           </button>
-        )}
+        ))}
+
+        <button
+          type="button"
+          onClick={onClearAll}
+          className="ml-auto text-sm font-semibold text-blue-700 transition hover:text-blue-800"
+        >
+          Clear all
+        </button>
       </div>
     </div>
   );

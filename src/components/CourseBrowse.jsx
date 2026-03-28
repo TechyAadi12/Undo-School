@@ -1,180 +1,344 @@
-import React, { useState, useMemo } from 'react';
-import { FiFilter } from 'react-icons/fi';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Show, SignInButton, useAuth } from '@clerk/react';
+import { FiClock, FiFilter, FiStar } from 'react-icons/fi';
 import { coursesData, filterOptions } from '../data/coursesData';
-import CourseCard from './CourseCard';
-import FilterDrawer from './FilterDrawer';
-import SearchBar from './SearchBar';
 import CategoryChips from './CategoryChips';
-import FilterTags from './FilterTags';
+import CourseCard from './CourseCard';
 import CourseSliderSection from './CourseSliderSection';
+import FilterTags from './FilterTags';
+import SearchBar from './SearchBar';
 import SkeletonLoader from './SkeletonLoader';
 
-export default function CourseBrowse({ isDarkMode }) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedAgeGroups, setSelectedAgeGroups] = useState([]);
-  const [selectedPriceRange, setSelectedPriceRange] = useState(null);
-  const [selectedRating, setSelectedRating] = useState(null);
-  const [sortBy, setSortBy] = useState('popular');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+const getInitialFilterState = (initialFilters = {}) => ({
+  searchQuery: initialFilters.searchQuery || '',
+  selectedCategories: initialFilters.selectedCategories || [],
+  selectedAgeGroups: initialFilters.selectedAgeGroups || [],
+  selectedPriceRange: initialFilters.selectedPriceRange || null,
+  selectedRating: initialFilters.selectedRating || null,
+  sortBy: initialFilters.sortBy || 'popular',
+});
+
+export default function CourseBrowse({
+  previewOnly = false,
+  compactMode = false,
+  savedCourseIdSet,
+  enrolledById,
+  initialFilters,
+  onFiltersChange,
+  onToggleSavedCourse,
+  onEnrollCourse,
+  onContinueCourse,
+}) {
+  const { isSignedIn } = useAuth();
+  const [filters, setFilters] = useState(() => getInitialFilterState(initialFilters));
   const [isLoading, setIsLoading] = useState(false);
 
-  // Helper functions to categorize courses
-  const getTrendingCourses = () => {
-    return coursesData
-      .slice()
-      .sort((a, b) => parseInt(b.enrolledCount.replace(',', '')) - parseInt(a.enrolledCount.replace(',', '')))
-      .slice(0, 6);
-  };
+  useEffect(() => {
+    onFiltersChange?.(filters);
+  }, [filters, onFiltersChange]);
 
-  const getTopRatedCourses = () => {
-    return coursesData
-      .filter((course) => course.rating >= 4.7)
-      .slice()
-      .sort((a, b) => b.rating - a.rating)
-      .slice(0, 6);
-  };
+  useEffect(() => {
+    setIsLoading(true);
+    const timeout = window.setTimeout(() => setIsLoading(false), 220);
 
-  const getNewCourses = () => {
-    return coursesData
-      .filter((course) => course.badge === 'New course')
-      .slice(0, 6);
-  };
+    return () => window.clearTimeout(timeout);
+  }, [
+    filters.searchQuery,
+    filters.selectedCategories,
+    filters.selectedAgeGroups,
+    filters.selectedPriceRange,
+    filters.selectedRating,
+    filters.sortBy,
+  ]);
 
-  // Filter and sort logic
   const filteredCourses = useMemo(() => {
-    let result = coursesData;
+    let result = [...coursesData];
 
-    // Search filter
-    if (searchQuery.trim()) {
+    if (filters.searchQuery.trim()) {
+      const normalizedQuery = filters.searchQuery.toLowerCase();
       result = result.filter((course) =>
-        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.instructor.toLowerCase().includes(searchQuery.toLowerCase())
+        [course.title, course.category, course.instructor].some((value) =>
+          value.toLowerCase().includes(normalizedQuery)
+        )
       );
     }
 
-    // Category filter
-    if (selectedCategories.length > 0) {
-      result = result.filter((course) =>
-        selectedCategories.includes(course.category)
-      );
+    if (filters.selectedCategories.length > 0) {
+      result = result.filter((course) => filters.selectedCategories.includes(course.category));
     }
 
-    // Age group filter
-    if (selectedAgeGroups.length > 0) {
-      result = result.filter((course) =>
-        selectedAgeGroups.includes(course.ageGroup)
-      );
+    if (filters.selectedAgeGroups.length > 0) {
+      result = result.filter((course) => filters.selectedAgeGroups.includes(course.ageGroup));
     }
 
-    // Price range filter
-    if (selectedPriceRange) {
+    if (filters.selectedPriceRange) {
       result = result.filter(
         (course) =>
-          course.price >= selectedPriceRange.min &&
-          course.price <= selectedPriceRange.max
+          course.price >= filters.selectedPriceRange.min &&
+          course.price <= filters.selectedPriceRange.max
       );
     }
 
-    // Rating filter
-    if (selectedRating) {
-      result = result.filter((course) => course.rating >= selectedRating);
+    if (filters.selectedRating) {
+      result = result.filter((course) => course.rating >= filters.selectedRating);
     }
 
-    // Sorting
-    switch (sortBy) {
+    switch (filters.sortBy) {
       case 'newest':
-        result = result.reverse();
+        result.reverse();
         break;
       case 'price-low':
-        result = [...result].sort((a, b) => a.price - b.price);
+        result.sort((a, b) => a.price - b.price);
         break;
       case 'price-high':
-        result = [...result].sort((a, b) => b.price - a.price);
+        result.sort((a, b) => b.price - a.price);
         break;
       case 'rating':
-        result = [...result].sort((a, b) => b.rating - a.rating);
+        result.sort((a, b) => b.rating - a.rating);
         break;
-      case 'popular':
       default:
-        result = [...result].sort((a, b) =>
-          parseInt(b.enrolledCount.replace(',', '')) -
-          parseInt(a.enrolledCount.replace(',', ''))
+        result.sort(
+          (a, b) =>
+            Number.parseInt(b.enrolledCount.replace(',', ''), 10) -
+            Number.parseInt(a.enrolledCount.replace(',', ''), 10)
         );
     }
 
     return result;
-  }, [searchQuery, selectedCategories, selectedAgeGroups, selectedPriceRange, selectedRating, sortBy]);
+  }, [filters]);
+
+  const trendingCourses = useMemo(
+    () =>
+      [...coursesData]
+        .sort(
+          (a, b) =>
+            Number.parseInt(b.enrolledCount.replace(',', ''), 10) -
+            Number.parseInt(a.enrolledCount.replace(',', ''), 10)
+        )
+        .slice(0, 6),
+    []
+  );
+
+  const topRatedCourses = useMemo(
+    () => [...coursesData].sort((a, b) => b.rating - a.rating).slice(0, 6),
+    []
+  );
+
+  const newCourses = useMemo(
+    () => coursesData.filter((course) => course.badge === 'New course').slice(0, 6),
+    []
+  );
+
+  const hasActiveFilters =
+    Boolean(filters.searchQuery) ||
+    filters.selectedCategories.length > 0 ||
+    filters.selectedAgeGroups.length > 0 ||
+    Boolean(filters.selectedPriceRange) ||
+    Boolean(filters.selectedRating) ||
+    filters.sortBy !== 'popular';
+
+  const updateFilters = (nextFilters) => {
+    setFilters((prev) => ({
+      ...prev,
+      ...nextFilters,
+    }));
+  };
 
   const handleCategoryToggle = (category) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
-    );
+    setFilters((prev) => ({
+      ...prev,
+      selectedCategories: prev.selectedCategories.includes(category)
+        ? prev.selectedCategories.filter((item) => item !== category)
+        : [...prev.selectedCategories, category],
+    }));
   };
 
   const handleAgeGroupToggle = (ageGroup) => {
-    setSelectedAgeGroups((prev) =>
-      prev.includes(ageGroup)
-        ? prev.filter((a) => a !== ageGroup)
-        : [...prev, ageGroup]
-    );
+    setFilters((prev) => ({
+      ...prev,
+      selectedAgeGroups: prev.selectedAgeGroups.includes(ageGroup)
+        ? prev.selectedAgeGroups.filter((item) => item !== ageGroup)
+        : [...prev.selectedAgeGroups, ageGroup],
+    }));
   };
 
   const handleResetFilters = () => {
-    setSearchQuery('');
-    setSelectedCategories([]);
-    setSelectedAgeGroups([]);
-    setSelectedPriceRange(null);
-    setSelectedRating(null);
-    setSortBy('popular');
+    setFilters(getInitialFilterState());
   };
 
-  const handleRemoveCategory = (category) => {
-    setSelectedCategories((prev) => prev.filter((c) => c !== category));
+  const getCourseCardProps = (course) => {
+    const enrollmentState = enrolledById.get(course.id);
+
+    return {
+      isAuthenticated: isSignedIn,
+      isPreviewMode: previewOnly,
+      isSaved: savedCourseIdSet.has(course.id),
+      isEnrolled: Boolean(enrollmentState),
+      progress: enrollmentState?.progress || 0,
+      onToggleSave: onToggleSavedCourse,
+      onEnroll: onEnrollCourse,
+      onContinue: onContinueCourse,
+    };
   };
-
-  const handleRemovePriceRange = () => {
-    setSelectedPriceRange(null);
-  };
-
-  const handleRemoveRating = () => {
-    setSelectedRating(null);
-  };
-
-  const hasActiveFilters =
-    searchQuery ||
-    selectedCategories.length > 0 ||
-    selectedAgeGroups.length > 0 ||
-    selectedPriceRange ||
-    selectedRating ||
-    sortBy !== 'popular';
-
-  const trendingCourses = getTrendingCourses();
-  const topRatedCourses = getTopRatedCourses();
-  const newCourses = getNewCourses();
 
   return (
-    <div className="min-h-screen transition-colors duration-300">
-      {/* Sticky Header Section */}
-      <header className="sticky top-0 z-20 border-b border-white/30 bg-white/20 shadow-sm backdrop-blur-xl transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 xs:px-6 md:px-8 py-3 md:py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
-              <h1 className="text-h4 md:text-h3 font-bold text-slate-950 transition-colors duration-300">
-                Browse Courses
-              </h1>
+    <section id="courses" className={compactMode ? 'py-0' : 'px-4 py-14 sm:px-6 lg:px-8'}>
+      <div className="mx-auto max-w-7xl">
+        <div className={`border border-white/45 bg-white/70 shadow-xl shadow-slate-900/5 backdrop-blur-xl ${compactMode ? 'rounded-[1.5rem] p-4 md:p-5' : 'rounded-[2rem] p-6 md:p-8'}`}>
+          <div className={`flex flex-col ${compactMode ? 'gap-4' : 'gap-6'} lg:flex-row lg:items-start lg:justify-between`}>
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700">
+                <FiStar className="h-4 w-4" />
+                Visitor and member flows stay connected
+              </div>
+              <h2 className={`font-bold text-slate-900 ${compactMode ? 'mt-3 text-2xl md:text-3xl' : 'mt-4 text-3xl md:text-4xl'}`}>
+                {previewOnly
+                  ? 'Explore a polished course preview before you sign in.'
+                  : 'Explore courses with sharper filters and clearer enrollment cues.'}
+              </h2>
+              <p className={`text-sm text-slate-600 ${compactMode ? 'mt-2' : 'mt-3 md:text-base'}`}>
+                {previewOnly
+                  ? 'Use age group and domain filters to discover what fits, then log in to unlock full course details, dashboard access, and enrollment flows.'
+                  : 'Browse by age group and domain, compare trusted signals like ratings and demand, then sign in only when you are ready to enroll.'}
+              </p>
             </div>
 
-            {/* Desktop Sort */}
-            <div className="hidden md:flex items-center gap-2">
-              <label className="text-label text-slate-700 transition-colors duration-300">Sort:</label>
+            <div className={`w-full max-w-md border border-white/45 bg-slate-950 text-white shadow-lg shadow-slate-950/15 ${compactMode ? 'rounded-[1.25rem] p-4' : 'rounded-[1.75rem] p-5'}`}>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300">State-aware UX</p>
+              <div className="mt-4 space-y-3 text-sm text-slate-200">
+                <div className="flex items-start gap-3 rounded-2xl bg-white/10 p-3">
+                  <FiFilter className="mt-0.5 h-4 w-4 text-cyan-300" />
+                  Filters persist before login and shape dashboard recommendations after login.
+                </div>
+                <div className="flex items-start gap-3 rounded-2xl bg-white/10 p-3">
+                  <FiClock className="mt-0.5 h-4 w-4 text-cyan-300" />
+                  Enrolled courses keep progress locally so the dashboard feels alive immediately.
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <Show when="signed-out">
+                  <SignInButton mode="modal">
+                    <button
+                      type="button"
+                      className="inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+                    >
+                      Login to unlock enrollment
+                    </button>
+                  </SignInButton>
+                </Show>
+                <Show when="signed-in">
+                  <div className="rounded-2xl bg-emerald-500/15 px-4 py-3 text-sm font-medium text-emerald-200">
+                    Logged in: enroll, save, and continue learning from your dashboard.
+                  </div>
+                </Show>
+              </div>
+            </div>
+          </div>
+
+          <div className={compactMode ? 'mt-5' : 'mt-8'}>
+            <SearchBar
+              searchQuery={filters.searchQuery}
+              setSearchQuery={(searchQuery) => updateFilters({ searchQuery })}
+            />
+          </div>
+
+          <div className={compactMode ? 'mt-5' : 'mt-6'}>
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">Domains</h3>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="text-sm font-semibold text-blue-700 transition hover:text-blue-800"
+                >
+                  Clear all filters
+                </button>
+              )}
+            </div>
+            <CategoryChips
+              categories={filterOptions.categories}
+              selectedCategories={filters.selectedCategories}
+              onCategoryToggle={handleCategoryToggle}
+            />
+          </div>
+
+          <div className={`grid gap-3 lg:grid-cols-4 ${compactMode ? 'mt-5' : 'mt-6'}`}>
+            <label className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                Age group
+              </span>
               <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="focus-outline rounded-lg border border-white/40 bg-white/70 px-3 py-2 text-sm text-neutral-900 transition-all-smooth hover:border-primary-500"
+                value={filters.selectedAgeGroups[0] || ''}
+                onChange={(event) =>
+                  updateFilters({
+                    selectedAgeGroups: event.target.value ? [event.target.value] : [],
+                  })
+                }
+                className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none"
+              >
+                <option value="">All age groups</option>
+                {filterOptions.ageGroups.map((ageGroup) => (
+                  <option key={ageGroup} value={ageGroup}>
+                    {ageGroup}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                Budget
+              </span>
+              <select
+                value={filters.selectedPriceRange?.label || ''}
+                onChange={(event) =>
+                  updateFilters({
+                    selectedPriceRange:
+                      filterOptions.priceRanges.find((range) => range.label === event.target.value) || null,
+                  })
+                }
+                className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none"
+              >
+                <option value="">Any budget</option>
+                {filterOptions.priceRanges.map((range) => (
+                  <option key={range.label} value={range.label}>
+                    {range.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                Minimum rating
+              </span>
+              <select
+                value={filters.selectedRating || ''}
+                onChange={(event) =>
+                  updateFilters({
+                    selectedRating: event.target.value ? Number(event.target.value) : null,
+                  })
+                }
+                className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none"
+              >
+                <option value="">Any rating</option>
+                {filterOptions.ratings.map((rating) => (
+                  <option key={rating} value={rating}>
+                    {rating} and up
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                Sort by
+              </span>
+              <select
+                value={filters.sortBy}
+                onChange={(event) => updateFilters({ sortBy: event.target.value })}
+                className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none"
               >
                 {filterOptions.sortOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -182,240 +346,143 @@ export default function CourseBrowse({ isDarkMode }) {
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
           </div>
 
-          {/* Search Bar */}
-          <div className="mt-3">
-            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} isDarkMode={isDarkMode} />
-          </div>
-        </div>
-      </header>
+          <div className={`flex flex-wrap gap-2 ${compactMode ? 'mt-4' : 'mt-5'}`}>
+            {filterOptions.ageGroups.map((ageGroup) => {
+              const isActive = filters.selectedAgeGroups.includes(ageGroup);
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 xs:px-6 md:px-8 py-6 md:py-8">
-        {/* Category Chips Row */}
-        <div className="mb-8 animate-fade-in">
-          <CategoryChips
-            categories={filterOptions.categories}
-            selectedCategories={selectedCategories}
-            onCategoryToggle={handleCategoryToggle}
-            isDarkMode={isDarkMode}
+              return (
+                <button
+                  key={ageGroup}
+                  type="button"
+                  onClick={() => handleAgeGroupToggle(ageGroup)}
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                    isActive
+                      ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10'
+                      : 'bg-white text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  {ageGroup}
+                </button>
+              );
+            })}
+          </div>
+
+          <FilterTags
+            searchQuery={filters.searchQuery}
+            selectedCategories={filters.selectedCategories}
+            selectedAgeGroups={filters.selectedAgeGroups}
+            selectedPriceRange={filters.selectedPriceRange}
+            selectedRating={filters.selectedRating}
+            onClearSearch={() => updateFilters({ searchQuery: '' })}
+            onRemoveCategory={(category) =>
+              updateFilters({
+                selectedCategories: filters.selectedCategories.filter((item) => item !== category),
+              })
+            }
+            onRemoveAgeGroup={(ageGroup) =>
+              updateFilters({
+                selectedAgeGroups: filters.selectedAgeGroups.filter((item) => item !== ageGroup),
+              })
+            }
+            onRemovePriceRange={() => updateFilters({ selectedPriceRange: null })}
+            onRemoveRating={() => updateFilters({ selectedRating: null })}
+            onClearAll={handleResetFilters}
           />
         </div>
 
-        {/* Filters Section Above Courses */}
-        <div className="mb-8 animate-fade-in">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Category Filter */}
-            <div className="rounded-2xl border border-white/35 bg-white/55 p-4 shadow-lg shadow-fuchsia-950/5 backdrop-blur-md transition-colors">
-              <h3 className="mb-3 text-sm font-bold text-neutral-900 transition-colors">
-                Category
-              </h3>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {filterOptions.categories.map((category) => (
-                  <label key={category} className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={selectedCategories.includes(category)}
-                      onChange={() => handleCategoryToggle(category)}
-                      className={`w-4 h-4 rounded accent-primary-500 cursor-pointer ${isDarkMode ? 'bg-neutral-700 border-neutral-600' : 'border-neutral-300'}`}
-                    />
-                    <span className={`text-xs sm:text-sm transition-colors ${isDarkMode ? 'text-neutral-300 group-hover:text-primary-400' : 'text-neutral-700 group-hover:text-primary-600'}`}>
-                      {category}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
+        {!hasActiveFilters && (
+          <div className={`space-y-8 ${compactMode ? 'mt-7' : 'mt-10'}`}>
+            <CourseSliderSection
+              title="Trending now"
+              subtitle="High-demand learning paths with strong enrollment velocity."
+              courses={trendingCourses}
+              getCourseCardProps={getCourseCardProps}
+            />
+            <CourseSliderSection
+              title="Top rated"
+              subtitle="Courses learners consistently rate highly."
+              courses={topRatedCourses}
+              getCourseCardProps={getCourseCardProps}
+            />
+            <CourseSliderSection
+              title="New to EduPathway"
+              subtitle="Fresh additions for learners exploring new interests."
+              courses={newCourses}
+              getCourseCardProps={getCourseCardProps}
+            />
+          </div>
+        )}
 
-            {/* Age Group Filter */}
-            <div className="rounded-2xl border border-white/35 bg-white/55 p-4 shadow-lg shadow-fuchsia-950/5 backdrop-blur-md transition-colors">
-              <h3 className="mb-3 text-sm font-bold text-neutral-900 transition-colors">
-                Age Group
-              </h3>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {filterOptions.ageGroups.map((ageGroup) => (
-                  <label key={ageGroup} className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={selectedAgeGroups.includes(ageGroup)}
-                      onChange={() => handleAgeGroupToggle(ageGroup)}
-                      className={`w-4 h-4 rounded accent-primary-500 cursor-pointer ${isDarkMode ? 'bg-neutral-700 border-neutral-600' : 'border-neutral-300'}`}
-                    />
-                    <span className={`text-xs sm:text-sm transition-colors ${isDarkMode ? 'text-neutral-300 group-hover:text-primary-400' : 'text-neutral-700 group-hover:text-primary-600'}`}>
-                      {ageGroup}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Price Range Filter */}
-            <div className="rounded-2xl border border-white/35 bg-white/55 p-4 shadow-lg shadow-fuchsia-950/5 backdrop-blur-md transition-colors">
-              <h3 className="mb-3 text-sm font-bold text-neutral-900 transition-colors">
-                Price Range
-              </h3>
-              <div className="space-y-2">
-                {filterOptions.priceRanges.map((range) => (
-                  <label key={range.label} className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="radio"
-                      name="priceRange"
-                      checked={selectedPriceRange?.label === range.label}
-                      onChange={() => setSelectedPriceRange(range)}
-                      className={`w-4 h-4 accent-primary-500 cursor-pointer ${isDarkMode ? 'bg-neutral-700 border-neutral-600' : 'border-neutral-300'}`}
-                    />
-                    <span className={`text-xs sm:text-sm transition-colors ${isDarkMode ? 'text-neutral-300 group-hover:text-primary-400' : 'text-neutral-700 group-hover:text-primary-600'}`}>
-                      {range.label}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Rating Filter */}
-            <div className="rounded-2xl border border-white/35 bg-white/55 p-4 shadow-lg shadow-fuchsia-950/5 backdrop-blur-md transition-colors">
-              <h3 className="mb-3 text-sm font-bold text-neutral-900 transition-colors">
-                Rating
-              </h3>
-              <div className="space-y-2">
-                {filterOptions.ratings.map((rating) => (
-                  <label key={rating} className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="radio"
-                      name="rating"
-                      checked={selectedRating === rating}
-                      onChange={() => setSelectedRating(rating)}
-                      className={`w-4 h-4 accent-primary-500 cursor-pointer ${isDarkMode ? 'bg-neutral-700 border-neutral-600' : 'border-neutral-300'}`}
-                    />
-                    <span className={`text-xs sm:text-sm transition-colors ${isDarkMode ? 'text-neutral-300 group-hover:text-primary-400' : 'text-neutral-700 group-hover:text-primary-600'}`}>
-                      {rating}+ ⭐
-                    </span>
-                  </label>
-                ))}
-              </div>
+        <div id="all-courses" className={compactMode ? 'mt-7' : 'mt-10'}>
+          <div className={`flex flex-col gap-2 md:flex-row md:items-end md:justify-between ${compactMode ? 'mb-4' : 'mb-6'}`}>
+            <div>
+              <h2 className={`font-bold text-slate-900 ${compactMode ? 'text-2xl' : 'text-3xl'}`}>
+                {hasActiveFilters
+                  ? `Matching courses (${filteredCourses.length})`
+                  : previewOnly
+                  ? 'Featured course previews'
+                  : 'Explore all courses'}
+              </h2>
+              <p className="mt-2 text-sm text-slate-600">
+                {previewOnly
+                  ? 'Visitors can preview the catalog here, then move into the full dashboard and enrollment flow after login.'
+                  : 'Clear cues, stronger card hierarchy, and login-aware actions make browsing feel more intentional.'}
+              </p>
             </div>
           </div>
 
-          {/* Reset Filters Button */}
-          {hasActiveFilters && (
-            <div className="mt-4 flex gap-2">
+          {isLoading ? (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <SkeletonLoader count={6} />
+            </div>
+          ) : filteredCourses.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {(previewOnly ? filteredCourses.slice(0, 6) : filteredCourses).map((course) => (
+                <CourseCard key={course.id} course={course} {...getCourseCardProps(course)} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[2rem] border border-dashed border-slate-300 bg-white/65 px-6 py-12 text-center backdrop-blur-md">
+              <h3 className="text-2xl font-semibold text-slate-900">No courses match these filters</h3>
+              <p className="mx-auto mt-2 max-w-lg text-sm text-slate-600">
+                Try broadening the age group or domain selection. Your saved filter state will still be waiting after login.
+              </p>
               <button
+                type="button"
                 onClick={handleResetFilters}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${isDarkMode ? 'text-primary-400 hover:bg-primary-950 bg-neutral-800' : 'text-primary-600 hover:bg-primary-50 bg-neutral-50'}`}
+                className="mt-5 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
-                Clear Filters
+                Reset filters
               </button>
             </div>
           )}
-        </div>
 
-        {/* Courses Section */}
-        <section className="w-full">
-            {/* Filter Tags */}
-            {hasActiveFilters && (
-              <FilterTags
-                searchQuery={searchQuery}
-                selectedCategories={selectedCategories}
-                selectedPriceRange={selectedPriceRange}
-                selectedRating={selectedRating}
-                priceRanges={filterOptions.priceRanges}
-                onRemoveCategory={handleRemoveCategory}
-                onRemovePriceRange={handleRemovePriceRange}
-                onRemoveRating={handleRemoveRating}
-                onClearAll={handleResetFilters}
-                isDarkMode={isDarkMode}
-              />
-            )}
-
-            {/* Trending Courses Slider */}
-            {!hasActiveFilters && trendingCourses.length > 0 && (
-              <CourseSliderSection
-                title="🔥 Trending Now"
-                courses={trendingCourses}
-                isDarkMode={isDarkMode}
-              />
-            )}
-
-            {/* Top Rated Courses Slider */}
-            {!hasActiveFilters && topRatedCourses.length > 0 && (
-              <CourseSliderSection
-                title="⭐ Top Rated"
-                courses={topRatedCourses}
-                isDarkMode={isDarkMode}
-              />
-            )}
-
-            {/* New Courses Slider */}
-            {!hasActiveFilters && newCourses.length > 0 && (
-              <CourseSliderSection
-                title="✨ New Courses"
-                courses={newCourses}
-                isDarkMode={isDarkMode}
-              />
-            )}
-
-            {/* All Courses Slider */}
-            <div id="all-courses">
-              <h2 className={`text-h4 md:text-h3 font-bold mb-6 transition-colors ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
-                {hasActiveFilters ? `Search Results (${filteredCourses.length})` : 'All Courses'}
-              </h2>
-
-              {/* Loading State */}
-              {isLoading && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <SkeletonLoader isDarkMode={isDarkMode} count={6} />
-                </div>
-              )}
-
-              {/* Empty State */}
-              {filteredCourses.length === 0 && !isLoading && (
-                <div className="text-center py-12 md:py-16">
-                  <div className="text-6xl mb-4">🔍</div>
-                  <h3 className={`text-h4 mb-2 ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
-                    No courses found
-                  </h3>
-                  <p className={`text-body-md mb-6 ${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}`}>
-                    Try adjusting your filters or search query
-                  </p>
-                  <button
-                    onClick={handleResetFilters}
-                    className="px-6 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-all duration-200 active:scale-95 hover:shadow-lg transform hover:-translate-y-0.5"
-                  >
-                    Reset filters
-                  </button>
-                </div>
-              )}
-
-              {/* Courses Slider */}
-              {filteredCourses.length > 0 && !isLoading && (
-                <CourseSliderSection
-                  title=""
-                  courses={filteredCourses}
-                  isDarkMode={isDarkMode}
-                  maxItems={filteredCourses.length}
-                />
-              )}
-
-              {/* Load More Button */}
-              {filteredCourses.length > 0 && !isLoading && (
-                <div className="mt-12 text-center animate-fade-in">
-                  <button
-                    className={`px-8 py-3 rounded-lg font-medium transition-all duration-200 active:scale-95 border-2 hover:shadow-lg transform hover:-translate-y-1 group relative overflow-hidden ${
-                      isDarkMode
-                        ? 'border-primary-400 text-primary-400 hover:bg-primary-950'
-                        : 'border-primary-500 text-primary-500 hover:bg-primary-50'
-                    }`}
-                  >
-                    <span className="relative z-10">Load more courses</span>
-                    <span className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-200 ${isDarkMode ? 'bg-primary-950' : 'bg-primary-50'}`}></span>
-                  </button>
-                </div>
-              )}
+          {previewOnly && filteredCourses.length > 0 && (
+            <div className="mt-8 rounded-[2rem] border border-slate-900/10 bg-slate-900 px-6 py-8 text-center text-white shadow-xl shadow-slate-900/10">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300">
+                Unlock the full experience
+              </p>
+              <h3 className="mt-3 text-2xl font-bold">
+                Sign in to view full course details, enrollments, and your learning dashboard.
+              </h3>
+              <p className="mx-auto mt-3 max-w-2xl text-sm text-slate-200">
+                After login, learners move into the dashboard where recommendations, saved courses, enrollment progress, and course management all live together.
+              </p>
+              <SignInButton mode="modal">
+                <button
+                  type="button"
+                  className="mt-5 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+                >
+                  Sign in to continue
+                </button>
+              </SignInButton>
             </div>
-        </section>
+          )}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

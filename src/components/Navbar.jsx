@@ -1,97 +1,147 @@
 import React, { useState } from 'react';
+import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/react';
 import { FiMenu, FiX } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+
+const navLinks = [
+  { label: 'Home', id: 'home' },
+  { label: 'About', id: 'about' },
+  { label: 'Contact', id: 'contact' },
+];
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const navLinks = [
-    { label: 'Home', href: '#home', id: 'home' },
-    { label: 'Courses', href: '#courses', id: 'courses' },
-    { label: 'About', href: '#about', id: 'about' },
-    { label: 'Contact', href: '#contact', id: 'contact' },
-  ];
-
-  const handleNavClick = (e, linkId) => {
-    e.preventDefault();
+  const handleSectionClick = (sectionId) => {
     setIsMobileMenuOpen(false);
+    navigate('/');
 
-    if (linkId === 'home') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (linkId === 'courses') {
-      const coursesSection = document.querySelector('header');
-      if (coursesSection) {
-        coursesSection.scrollIntoView({ behavior: 'smooth' });
+    window.setTimeout(() => {
+      if (sectionId === 'home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
       }
-    } else {
-      const element = document.getElementById(linkId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
       }
-    }
+    }, 50);
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/30 bg-white/20 shadow-lg shadow-fuchsia-900/10 backdrop-blur-xl transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center transform hover:scale-110 transition duration-200">
-              <span className="text-white font-bold text-lg">US</span>
-            </div>
-            <span className="text-xl font-bold text-slate-900 transition duration-200">Undo School</span>
+    <nav className="sticky top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center justify-between rounded-[1.75rem] border border-slate-200/70 bg-slate-50/95 px-4 py-3 shadow-lg shadow-slate-900/5 backdrop-blur-2xl sm:px-5">
+        <Link to="/" className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 via-rose-500 to-sky-500 font-bold text-white shadow-lg shadow-sky-500/20">
+            EP
           </div>
+          <div>
+            <p className="text-base font-bold text-slate-900 sm:text-lg">EduPathway</p>
+            <p className="text-xs text-slate-500">Age-aware learning discovery</p>
+          </div>
+        </Link>
 
-          {/* Desktop Navigation Links - Rightmost */}
-          <div className="hidden md:flex items-center gap-8 ml-auto">
+        <div className="hidden items-center gap-2 rounded-full bg-white px-2 py-2 shadow-sm md:flex">
+          {navLinks.map((link) => (
+            <button
+              key={link.id}
+              type="button"
+              onClick={() => handleSectionClick(link.id)}
+              className="rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition duration-300 hover:bg-white hover:text-blue-700"
+            >
+              {link.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="hidden items-center gap-3 md:flex">
+          <Show when="signed-out">
+            <SignInButton mode="modal">
+              <button
+                type="button"
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:text-blue-700"
+              >
+                Login
+              </button>
+            </SignInButton>
+            <SignUpButton mode="modal">
+              <button
+                type="button"
+                className="rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/10 transition duration-300 hover:-translate-y-0.5 hover:bg-blue-700"
+              >
+                Sign up
+              </button>
+            </SignUpButton>
+          </Show>
+
+          <Show when="signed-in">
+            <Link
+              to="/dashboard"
+              className="rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+            >
+              Dashboard
+            </Link>
+            <UserButton />
+          </Show>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsMobileMenuOpen((value) => !value)}
+          className="rounded-xl border border-slate-200 bg-white p-2 text-slate-700 shadow-sm backdrop-blur-md transition hover:bg-slate-100 md:hidden"
+          aria-label="Toggle navigation menu"
+        >
+          {isMobileMenuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+        </button>
+      </div>
+
+      {isMobileMenuOpen && (
+        <div className="mx-auto mt-3 max-w-7xl rounded-[1.5rem] border border-slate-200 bg-slate-50/95 px-4 pb-5 pt-4 shadow-lg shadow-slate-900/5 backdrop-blur-xl md:hidden">
+          <div className="space-y-2">
             {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.id)}
-                className="transition duration-200 font-medium cursor-pointer relative group text-slate-700 hover:text-blue-700"
+              <button
+                key={link.id}
+                type="button"
+                onClick={() => handleSectionClick(link.id)}
+                className="block w-full rounded-2xl px-4 py-3 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-blue-700"
               >
                 {link.label}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
-              </a>
+              </button>
             ))}
           </div>
 
-          <div className="flex items-center gap-2 ml-auto md:ml-4">
-            <button
-              className="md:hidden rounded-lg p-2 text-slate-700 transition duration-200 hover:bg-white/40"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              {isMobileMenuOpen ? (
-                <FiX size={24} />
-              ) : (
-                <FiMenu size={24} />
-              )}
-            </button>
+          <div className="mt-4 grid gap-3">
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <button type="button" className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700">
+                  Login
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button type="button" className="w-full rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white">
+                  Sign up
+                </button>
+              </SignUpButton>
+            </Show>
+
+            <Show when="signed-in">
+              <Link
+                to="/dashboard"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block rounded-2xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white"
+              >
+                Dashboard
+              </Link>
+              <div className="flex items-center justify-between rounded-2xl border border-white/35 bg-white px-4 py-3">
+                <span className="text-sm font-medium text-slate-700">Profile</span>
+                <UserButton />
+              </div>
+            </Show>
           </div>
         </div>
-
-        {/* Mobile Navigation Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden animate-slide-in-up border-t border-white/30 bg-white/25 pb-4 backdrop-blur-xl transition-colors duration-300">
-            <div className="flex flex-col gap-2 mt-4">
-              {navLinks.map((link, index) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.id)}
-                  className="cursor-pointer rounded-lg px-4 py-2 text-slate-700 transition duration-200 hover:bg-white/40 hover:text-blue-700"
-                  style={{
-                    animation: `slideInDown 0.3s ease-out ${index * 0.05}s backwards`
-                  }}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </nav>
   );
 }

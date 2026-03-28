@@ -78,20 +78,30 @@ export default function Contact() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-          <div className="space-y-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr,1.1fr]">
+          <div className="glass-tilt space-y-6 rounded-[2rem] border border-white/35 bg-slate-950/90 p-6 text-white shadow-xl shadow-slate-900/10">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300">
+                Talk to us
+              </p>
+              <h3 className="mt-2 text-2xl font-bold">Need help choosing the right course path?</h3>
+              <p className="mt-2 text-sm text-slate-300">
+                Tell us the learner age, goals, and preferred domain. We will guide you toward the best next step.
+              </p>
+            </div>
+
             {contactInfo.map((info, index) => {
               const Icon = info.icon;
               return (
-                <div key={index} className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                <div key={index} className="glass-tilt flex items-start gap-4 rounded-[1.5rem] border border-white/10 bg-white/8 p-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 via-rose-500 to-sky-500 text-white shadow-lg">
                     <Icon size={24} />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900">
+                    <h3 className="font-semibold text-white">
                       {info.label}
                     </h3>
-                    <p className="text-slate-700">{info.value}</p>
+                    <p className="text-slate-300">{info.value}</p>
                   </div>
                 </div>
               );
@@ -100,7 +110,7 @@ export default function Contact() {
 
           <form
             onSubmit={handleSubmit}
-            className="space-y-4 rounded-3xl border border-white/35 bg-white/50 p-6 shadow-xl shadow-fuchsia-950/10 backdrop-blur-md"
+            className="glass-tilt space-y-4 rounded-[2rem] border border-white/35 bg-white/62 p-6 shadow-xl shadow-fuchsia-950/10 backdrop-blur-md"
           >
             <input
               type="text"
@@ -145,7 +155,7 @@ export default function Contact() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-r from-blue-600 via-fuchsia-500 to-orange-400 px-6 py-3 font-semibold text-white shadow-lg shadow-fuchsia-950/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70"
+              className="w-full rounded-xl bg-gradient-to-r from-orange-500 via-rose-500 to-sky-500 px-6 py-3 font-semibold text-white shadow-lg shadow-fuchsia-950/20 transition duration-300 hover:-translate-y-0.5 hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70"
             >
               {loading ? 'Sending...' : 'Send Message'}
             </button>

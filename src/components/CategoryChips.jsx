@@ -5,7 +5,6 @@ export default function CategoryChips({
   categories,
   selectedCategories,
   onCategoryToggle,
-  isDarkMode,
 }) {
   const scrollContainer = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -50,11 +49,7 @@ export default function CategoryChips({
       {canScrollLeft && (
         <button
           onClick={() => scroll('left')}
-          className={`absolute -left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full transition-all ${
-            isDarkMode
-              ? 'bg-neutral-800 hover:bg-neutral-700 text-white'
-              : 'bg-white hover:bg-neutral-100 text-neutral-900'
-          } shadow-lg hover:shadow-xl`}
+          className="absolute -left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-2 text-neutral-900 shadow-lg transition-all hover:bg-neutral-100 hover:shadow-xl"
           aria-label="Scroll left"
         >
           <FiChevronLeft className="w-5 h-5" />
@@ -73,13 +68,9 @@ export default function CategoryChips({
             // Clear all selections
             selectedCategories.forEach((cat) => onCategoryToggle(cat));
           }}
-          className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 ${
+          className={`flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 font-medium transition-all transform hover:scale-105 active:scale-95 ${
             selectedCategories.length === 0
-              ? isDarkMode
-                ? 'bg-primary-500 text-white shadow-lg'
-                : 'bg-primary-500 text-white shadow-lg'
-              : isDarkMode
-              ? 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
+              ? 'bg-slate-900 text-white shadow-lg'
               : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
           }`}
         >
@@ -93,13 +84,9 @@ export default function CategoryChips({
             <button
               key={category}
               onClick={() => handleCategoryClick(category)}
-              className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 ${
+              className={`flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 font-medium transition-all transform hover:scale-105 active:scale-95 ${
                 isSelected
-                  ? isDarkMode
-                    ? 'bg-primary-500 text-white shadow-lg'
-                    : 'bg-primary-500 text-white shadow-lg'
-                  : isDarkMode
-                  ? 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
+                  ? 'bg-slate-900 text-white shadow-lg'
                   : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
               }`}
             >
@@ -114,11 +101,7 @@ export default function CategoryChips({
       {canScrollRight && (
         <button
           onClick={() => scroll('right')}
-          className={`absolute -right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full transition-all ${
-            isDarkMode
-              ? 'bg-neutral-800 hover:bg-neutral-700 text-white'
-              : 'bg-white hover:bg-neutral-100 text-neutral-900'
-          } shadow-lg hover:shadow-xl`}
+          className="absolute -right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-2 text-neutral-900 shadow-lg transition-all hover:bg-neutral-100 hover:shadow-xl"
           aria-label="Scroll right"
         >
           <FiChevronRight className="w-5 h-5" />
